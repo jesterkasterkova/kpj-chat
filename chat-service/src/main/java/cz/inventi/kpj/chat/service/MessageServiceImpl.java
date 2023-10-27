@@ -42,17 +42,33 @@ public class MessageServiceImpl implements MessageService, MessageListener {
 
     @Override
     public UUID createMessage(MessageRequest messageRequest) {
+        MessageEvent messageEvent = messageMapper.requestToEvent(messageRequest);
+        messageEvent.setType(MessageType.MESSAGE);
+        messageEvent.setId(UUID.randomUUID());
+        messageEvent.setCreated(OffsetDateTime.now());
+        messageBroker.publish(messageEvent);
         // TODO: map messageRequest to messageEvent; set type, id and created; publish messageEvent via messageBroker and return its id
-        return UUID.randomUUID();
+        return messageEvent.getId();
     }
 
     @Override
     public void onMessage(MessageEvent messageEvent) {
-        // TODO: switch over messageEvent type; if it is a message, map it to Message and add it to messages list; if it is a presence check, just log it; if it is an unknown type, log a warning
+        switch (messageEvent.getType()) {
+            case MESSAGE -> messages.add(messageMapper.eventToDTO(messageEvent));
+            case PRESENCE -> log.info(messageEvent);
+        }
+        // TODO: switch over messageEvent type; if it is a message, map it to Message and add it to messages list; if it is a presence check, just
     }
 
-    // TODO: execute every 10 seconds (*/10 * * * * *)
+    @Scheduled(cron = "*/10 * * * * *")
     public void sendPresence() {
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.setCreated(OffsetDateTime.now());
+        messageEvent.setType(MessageType.PRESENCE);
+        messageEvent.setId(UUID.randomUUID());
+        messageEvent.setName("Nushi");
+        messageBroker.publish(messageEvent);
+        log.info("Presence message published");
         // TODO: create a new messageEvent with type PRESENCE, id, created and name; publish it via messageBroker and log an info message
     }
 }

@@ -7,8 +7,8 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
   jms:
     servicebus:
-      connection-string: # TODO: add connection string
-      topic-client-id: # TODO: add subscription name (subscriberYourName)
+      connection-string: Endpoint=sb://kpj-test-chat.servicebus.windows.net/;SharedAccessKeyName=kpj;SharedAccessKey=r2LNwbB181B8RcK8ItIxtco4wbMQIC1Q2+ASbBveXqw=
+      topic-client-id: subscriberNushi
       pricing-tier: standard
 
 logging:
